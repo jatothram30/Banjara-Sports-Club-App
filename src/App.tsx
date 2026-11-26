@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import {
   addDoc,
@@ -167,7 +166,9 @@ export default function App() {
   };
 
   const saveMatch = async (next: Match) => {
-    setUndoStack(old => [...old, match!].slice(-30));
+    if (!match) return;
+
+    setUndoStack(old => [...old, match].slice(-30));
     setMatch(next);
 
     await updateDoc(doc(db, "matches", next.id), {
@@ -188,6 +189,7 @@ export default function App() {
 
   const ball = async (runs: number) => {
     if (!match || match.status !== "LIVE") return;
+
     if (match.wickets >= 10 || match.balls >= match.overs * 6)
       return alert("Innings completed");
 
@@ -263,6 +265,7 @@ export default function App() {
 
   const changeStrike = async () => {
     if (!match) return;
+
     await saveMatch({
       ...match,
       striker: match.nonStriker,
@@ -272,8 +275,10 @@ export default function App() {
 
   const changeBowler = async () => {
     if (!match) return;
+
     const name = prompt("Enter next bowler name");
     if (!name) return;
+
     await saveMatch({ ...match, bowler: name });
   };
 
@@ -293,6 +298,7 @@ export default function App() {
         history: [],
         status: "LIVE"
       };
+
       await saveMatch(next);
       alert("Second innings started!");
     } else {
@@ -314,11 +320,11 @@ export default function App() {
       </header>
 
       <nav>
-        {["Home", "Teams", "Players", "New Match", "Matches", "Admin"].map(item =>
+        {["Home", "Teams", "Players", "New Match", "Matches", "Admin"].map(item => (
           <button key={item} onClick={() => setPage(item)}>
             {item}
           </button>
-        )}
+        ))}
       </nav>
 
       <main>
@@ -330,7 +336,8 @@ export default function App() {
             <p>Players: {players.length}</p>
             <p>Matches: {matches.length}</p>
             <h3>Live Matches</h3>
-            {matches.filter(m => m.status === "LIVE").map(m =>
+
+            {matches.filter(m => m.status === "LIVE").map(m => (
               <div key={m.id} className="card">
                 <b>{m.teamA} vs {m.teamB}</b>
                 <h2>{m.runs}/{m.wickets}</h2>
@@ -338,17 +345,22 @@ export default function App() {
                 <button onClick={() => {
                   setMatch(m);
                   setPage("Live Score");
-                }}>View Score</button>
+                }}>
+                  View Score
+                </button>
               </div>
-            )}
+            ))}
           </section>
         )}
 
         {page === "Teams" && (
           <section className="card">
             <h2>Team Registration</h2>
-            <input placeholder="Team name" value={teamName}
-              onChange={e => setTeamName(e.target.value)} />
+            <input
+              placeholder="Team name"
+              value={teamName}
+              onChange={e => setTeamName(e.target.value)}
+            />
             <button onClick={createTeam}>Register Team</button>
             <h3>Registered Teams</h3>
             {teams.map(t => <p key={t.id}>🏏 {t.name}</p>)}
@@ -358,26 +370,32 @@ export default function App() {
         {page === "Players" && (
           <section className="card">
             <h2>Player Registration</h2>
-            <input placeholder="Player name" value={playerName}
-              onChange={e => setPlayerName(e.target.value)} />
-            <select value={playerTeam}
-              onChange={e => setPlayerTeam(e.target.value)}>
+            <input
+              placeholder="Player name"
+              value={playerName}
+              onChange={e => setPlayerName(e.target.value)}
+            />
+            <select
+              value={playerTeam}
+              onChange={e => setPlayerTeam(e.target.value)}
+            >
               <option value="">Select Team</option>
-              {teams.map(t =>
+              {teams.map(t => (
                 <option key={t.id} value={t.name}>{t.name}</option>
-              )}
+              ))}
             </select>
             <button onClick={createPlayer}>Register Player</button>
             <h3>Player List</h3>
-            {players.map(p =>
+            {players.map(p => (
               <p key={p.id}>{p.name} — {p.team}</p>
-            )}
+            ))}
           </section>
         )}
 
         {page === "New Match" && (
           <section className="card">
             <h2>New Match Setup</h2>
+
             <label>Team A</label>
             <select value={teamA} onChange={e => setTeamA(e.target.value)}>
               <option value="">Select Team</option>
@@ -392,26 +410,41 @@ export default function App() {
 
             <label>Format</label>
             <select value={format} onChange={e => setFormat(e.target.value)}>
-              {["T10", "T20", "ODI", "Test", "Custom"].map(f =>
+              {["T10", "T20", "ODI", "Test", "Custom"].map(f => (
                 <option key={f}>{f}</option>
-              )}
+              ))}
             </select>
 
             <label>Overs</label>
-            <input type="number" value={overs}
-              onChange={e => setOvers(Number(e.target.value))} />
+            <input
+              type="number"
+              value={overs}
+              onChange={e => setOvers(Number(e.target.value))}
+            />
 
-            <input placeholder="Venue" value={venue}
-              onChange={e => setVenue(e.target.value)} />
+            <input
+              placeholder="Venue"
+              value={venue}
+              onChange={e => setVenue(e.target.value)}
+            />
 
-            <input placeholder="Opening striker" value={striker}
-              onChange={e => setStriker(e.target.value)} />
+            <input
+              placeholder="Opening striker"
+              value={striker}
+              onChange={e => setStriker(e.target.value)}
+            />
 
-            <input placeholder="Non-striker" value={nonStriker}
-              onChange={e => setNonStriker(e.target.value)} />
+            <input
+              placeholder="Non-striker"
+              value={nonStriker}
+              onChange={e => setNonStriker(e.target.value)}
+            />
 
-            <input placeholder="Opening bowler" value={bowler}
-              onChange={e => setBowler(e.target.value)} />
+            <input
+              placeholder="Opening bowler"
+              value={bowler}
+              onChange={e => setBowler(e.target.value)}
+            />
 
             <button className="gold" onClick={startMatch}>
               Start Match
@@ -423,9 +456,11 @@ export default function App() {
           <section className="card">
             <h2>{match.batting}</h2>
             <p>{match.teamA} vs {match.teamB}</p>
+
             <h1 className="score">
               {match.runs}/{match.wickets}
             </h1>
+
             <h3>Overs: {oversDisplay(match.balls)} / {match.overs}</h3>
 
             {match.target > 0 && <p>Target: {match.target}</p>}
@@ -437,9 +472,9 @@ export default function App() {
             {match.status === "LIVE" && (
               <>
                 <div className="score-grid">
-                  {[0, 1, 2, 3, 4, 6].map(n =>
+                  {[0, 1, 2, 3, 4, 6].map(n => (
                     <button key={n} onClick={() => ball(n)}>{n}</button>
-                  )}
+                  ))}
                 </div>
 
                 <div className="score-grid">
@@ -460,16 +495,17 @@ export default function App() {
             )}
 
             <h3>Ball History</h3>
-            {match.history.slice().reverse().map((h, i) =>
+            {match.history.slice().reverse().map((h, i) => (
               <span key={i} className="pill">{h}</span>
-            )}
+            ))}
           </section>
         )}
 
         {page === "Matches" && (
           <section className="card">
             <h2>Match Centre</h2>
-            {matches.map(m =>
+
+            {matches.map(m => (
               <div className="card" key={m.id}>
                 <h3>{m.teamA} vs {m.teamB}</h3>
                 <p>{m.format} • {m.venue}</p>
@@ -478,9 +514,11 @@ export default function App() {
                 <button onClick={() => {
                   setMatch(m);
                   setPage("Live Score");
-                }}>View Match</button>
+                }}>
+                  View Match
+                </button>
               </div>
-            )}
+            ))}
           </section>
         )}
 
@@ -500,5 +538,5 @@ export default function App() {
       </footer>
     </div>
   );
-      
-            
+}
+
