@@ -137,10 +137,12 @@ export default function App() {
     finally { setBusy(false); }
   }
 
-  async function saveMatch(match: Match, changes: Partial<Match>) {
-    await updateDoc(doc(db, "matches", match.id), changes as Record<string, unknown>);
-  }
-
+async function saveMatch(match: Match, changes: Partial<Match>) {
+  await updateDoc(
+    doc(db, "matches", match.id),
+    changes as any
+  );
+}
   async function addBall(kind: "0" | "1" | "2" | "3" | "4" | "6" | "WD" | "NB" | "B" | "LB" | "W") {
     if (!activeMatch || activeMatch.status !== "live") return;
     const m = activeMatch;
